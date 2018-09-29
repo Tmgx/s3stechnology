@@ -5,7 +5,8 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import com.companyname.sampletest.repository.StudentsRepository;
 @RestController
 public class StudentController {
 	
+	
 @Autowired
 StudentsRepository studentRepository;
 
@@ -32,7 +34,13 @@ public StudentEntity createStudent(@Valid @RequestBody StudentEntity student) {
 @GetMapping("/student/{id}")
 public StudentEntity getStudentById(@PathVariable(value = "id") Long studentId) {
 	return studentRepository.findById(studentId)
-			.orElseThrow((null));
+			.orElseThrow(() -> new RuntimeException("cannot find student"));
+}
+
+@GetMapping("/all")
+public String showAll(Model model) {
+	model.addAttribute("Student", studentRepository.findAll());
+	return "Students";
 }
 
 @DeleteMapping("/student/{id}")
@@ -61,12 +69,6 @@ public ResponseEntity<Object> updateStudent1(@RequestBody StudentEntity student,
 	StudentEntity studentUpdated =studentRepository.save(student);
 	return ResponseEntity.ok().body(studentUpdated);
 }
-
-
-
-
-
-
 
 
 }
